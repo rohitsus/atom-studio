@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atom — Studio Management</title>
+<title>atom content studio</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -174,6 +174,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
 }
 .pin-btn:hover{opacity:0.85}
 .pin-footer{font-size:11px;color:rgba(255,255,255,0.25);margin-top:20px}
+/* AVATARS */
+.avatar-stack{display:flex;align-items:center;gap:0}
+.av{width:20px;height:20px;border-radius:50%;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;margin-left:-5px;flex-shrink:0;color:#fff}
+.av:first-child{margin-left:0}
+.people-meta{display:flex;align-items:center;gap:5px}
+.people-label{font-size:10px;color:var(--muted)}
+.pin-logo-img{height:36px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;filter:none}
+/* EMAIL LOGIN */
+.pin-field{margin-bottom:10px;text-align:left}
+.pin-field-label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.pin-field-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:#FAFAF8;outline:none;transition:border-color .15s}
+.pin-field-input:focus{border-color:#1C1C1E}
+
 
 /* ── CONNECT STATUS DOT ── */
 .sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -198,10 +211,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
 <!-- PIN GATE -->
 <div id="pinGate">
   <div class="pin-box">
-    <div class="pin-logo">atom<em>.</em></div>
-    <div class="pin-sub">CHOPSHOPLAB Studio · Enter team PIN to continue</div>
-    <input class="pin-input" id="pinInput" type="password" placeholder="••••••"
-      maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')checkPin()">
+    <img class="pin-logo-img" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADOArYDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AIyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//9k=" alt="atom content studio">
+    <div class="pin-sub">atom content studio · internal tool</div>
+    <div class="pin-field">
+      <label class="pin-field-label">Your work email</label>
+      <input class="pin-field-input" id="pinEmail" type="email" placeholder="name@atomcontent.studio" autocomplete="email">
+    </div>
+    <div class="pin-field">
+      <label class="pin-field-label">Your PIN</label>
+      <input class="pin-field-input" id="pinInput" type="password" placeholder="••••••"
+        maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')checkPin()">
+    </div>
     <div class="pin-error" id="pinError"></div>
     <button class="pin-btn" onclick="checkPin()">Enter Studio →</button>
   </div>
@@ -215,7 +235,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
 </div>
 
 <div class="header">
-  <div class="logo">atom<em>.</em></div>
+  <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADOArYDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AIyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//9k=" alt="atom content studio" style="height:28px;display:block;filter:invert(1)">
   <div class="header-meta">
     <div class="conn-wrap" onclick="testConnection()" title="Click to test connection">
       <span class="sync-dot yellow" id="syncDot"></span>
@@ -233,7 +253,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
     <span class="tab-icon">📋</span> Contracts <span class="tab-count" id="count-contracts">0</span>
   </button>
   <button class="tab-btn" onclick="switchTab('retainers')" id="tab-retainers">
-    <span class="tab-icon">📱</span> All Things Social <span class="tab-count" id="count-retainers">0</span>
+    <span class="tab-icon">📱</span> Monthly Retainers <span class="tab-count" id="count-retainers">0</span>
   </button>
   <button class="tab-btn" onclick="switchTab('microdramas')" id="tab-microdramas">
     <span class="tab-icon">🎭</span> Microdramas &amp; Shows <span class="tab-count" id="count-microdramas">0</span>
@@ -247,7 +267,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
     <div class="section-header">
       <div>
         <div class="section-title">Content Studio</div>
-        <div class="section-subtitle">One-off campaigns &amp; projects</div>
+        <div class="section-subtitle">Satyavart &amp; Srestha</div>
       </div>
       <div class="header-actions">
         <input type="text" class="search-input" placeholder="Search…" id="search-studio" oninput="renderAll()">
@@ -280,8 +300,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
   <div id="panel-retainers" class="tab-panel">
     <div class="section-header">
       <div>
-        <div class="section-title">All Things Social</div>
-        <div class="section-subtitle">Full-time retainer clients</div>
+        <div class="section-title">Full-time Monthly Retainers</div>
+        <div class="section-subtitle">Retainer clients</div>
       </div>
       <div class="header-actions">
         <input type="text" class="search-input" placeholder="Search…" id="search-retainers" oninput="renderAll()">
@@ -422,25 +442,61 @@ const SEED = {
 // ============================================================
 const SUPABASE_URL = 'https://rkobolostvmrzpdsocaz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrb2JvbG9zdHZtcnpwZHNvY2F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MDk5NjMsImV4cCI6MjA5MjA4NTk2M30.bLcyfzS1g9ol-eKD7BRzYyX1RXQrrkzYxgaY-nh0iJs';
-const TEAM_PIN     = 'chopshop';
+const TEAM_LOGINS = {
+  'apoorvchaudhary@atomcontent.studio': '1001',
+  'aishwarya@atomcontent.studio': '1002',
+  'hr@atomcontent.studio': '1003',
+  'abhinav@atomcontent.studio': '1004',
+  'sakshamchaudhary@atomcontent.studio': '1005',
+  'divyanshu@atomcontent.studio': '1006',
+  'varun@atomcontent.studio': '1007',
+  'uthkarsha@atomcontent.studio': '1008',
+  'meghanarao@atomcontent.studio': '1009',
+  'abhinaya@atomcontent.studio': '1010',
+  'satyavartsharma@atomcontent.studio': '1011',
+  'samuel@atomcontent.studio': '1012',
+  'akshayrakte@atomcontent.studio': '1013',
+  'sairam@atomcontent.studio': '1014',
+  'vishnu@atomcontent.studio': '1015',
+  'anagha@atomcontent.studio': '1016',
+  'vaibhavlaveti@atomcontent.studio': '1017',
+  'sameer@atomcontent.studio': '1018',
+  'srestharoy@atomcontent.studio': '1019',
+  'saahilgupta@atomcontent.studio': '1020',
+  'prerana@atomcontent.studio': '1021',
+  'vaishnavi@atomcontent.studio': '1022',
+  'dattaprasad@atomcontent.studio': '1023',
+  'piyali@atomcontent.studio': '1024',
+  'akanksha@atomcontent.studio': '1025',
+  'manya@atomcontent.studio': '1026',
+  'anamrizwan@atomcontent.studio': '1027',
+  'akhilesh@atomcontent.studio': '1028',
+  'dhanush@atomcontent.studio': '1029',
+  'premika@atomcontent.studio': '1030',
+  'kunal@atomcontent.studio': '1031',
+  'amogh@atomcontent.studio': '1032',
+  'rohit@atomcontent.studio': '0000'
+};
 // ============================================================
-//  PIN GATE
+//  LOGIN GATE
 // ============================================================
 function checkPin(){
-  const val = document.getElementById('pinInput').value.trim();
-  if(val === TEAM_PIN){
+  const email = (document.getElementById('pinEmail')?.value||'').trim().toLowerCase();
+  const pin   = (document.getElementById('pinInput').value||'').trim();
+  const err   = document.getElementById('pinError');
+  const inp   = document.getElementById('pinInput');
+  if(TEAM_LOGINS[email] && TEAM_LOGINS[email] === pin){
     sessionStorage.setItem('atomAuth','1');
+    sessionStorage.setItem('atomUser', email.split('@')[0]);
     document.getElementById('pinGate').style.display = 'none';
     init();
   } else {
-    const inp = document.getElementById('pinInput');
-    const err = document.getElementById('pinError');
-    err.textContent = 'Wrong PIN — try again';
+    err.textContent = !email ? 'Enter your email first' : !TEAM_LOGINS[email] ? 'Email not recognised' : 'Wrong PIN — try again';
     inp.classList.remove('shake');
-    void inp.offsetWidth; // reflow to restart animation
+    void inp.offsetWidth;
     inp.classList.add('shake');
     inp.value = '';
-    setTimeout(()=>{ err.textContent=''; inp.classList.remove('shake'); }, 2000);
+    setTimeout(()=>{ err.textContent=''; inp.classList.remove('shake'); }, 2500);
   }
 }
 
@@ -660,6 +716,31 @@ function cardFooter(tab,id,status){
   </div>`;
 }
 
+
+// AVATAR HELPER
+const AV_COLORS = [
+  ['#E8F4FD','#185FA5'],['#D1FAE5','#065F46'],['#EDE9FE','#5B21B6'],
+  ['#FEF3C7','#92400E'],['#FEE2E2','#991B1B'],['#F0FDF4','#166534']
+];
+function initials(name){
+  const p = name.trim().split(/\s+/);
+  return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();
+}
+function avatarStack(peopleStr){
+  if(!peopleStr) return '';
+  const people = peopleStr.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!people.length) return '';
+  const visible = people.slice(0,3);
+  const extra = people.length - 3;
+  const avs = visible.map((n,i)=>{
+    const c = AV_COLORS[i % AV_COLORS.length];
+    return `<span class="av" style="background:${c[0]};color:${c[1]};z-index:${10-i}">${esc(initials(n))}</span>`;
+  }).join('');
+  const more = extra>0 ? `<span class="av" style="background:#F0EEE8;color:#6B6B6B">+${extra}</span>` : '';
+  const first = people[0].split(' ')[0];
+  const label = people.length>1 ? `${first} + ${people.length-1}` : first;
+  return `<span class="people-meta"><span class="avatar-stack">${avs}${more}</span><span class="people-label">${esc(label)}</span></span>`;
+}
 // ============================================================
 //  CARD TEMPLATES
 // ============================================================
@@ -675,9 +756,10 @@ function studioCard(i){
     <div class="card-meta">
       ${i.type?`<span class="meta-tag">🎬 ${esc(i.type)}</span>`:''}
       ${pdot(i.priority)}
-      ${i.deadline?`<span class="meta-tag">📅 ${fmtDate(i.deadline)}</span>`:''}
-      ${i.teamLead?`<span class="meta-tag">👤 ${esc(i.teamLead)}</span>`:''}
+      ${i.deadline?`<span class="meta-tag" style="background:#FEE2E2;color:#991B1B;font-weight:700">⏰ ${fmtDate(i.deadline)}</span>`:'<span class="meta-tag" style="background:#FEF3C7;color:#92400E">⏰ No deadline</span>'}
+      ${i.people?avatarStack(i.people):''}
     </div>
+    ${i.deliverables?`<div class="card-info-line"><span class="il-label">📦 Deliverables:</span> ${esc(i.deliverables)}</div>`:''}
     ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
     ${cardFooter('studio',i.id,i.status)}
   </div>`;
@@ -695,8 +777,10 @@ function contractCard(i){
     <div class="card-meta">
       ${i.type?`<span class="meta-tag">📁 ${esc(i.type)}</span>`:''}
       ${pdot(i.priority)}
-      ${i.deadline?`<span class="meta-tag">📅 ${fmtDate(i.deadline)}</span>`:''}
+      ${i.deadline?`<span class="meta-tag" style="background:#FEE2E2;color:#991B1B;font-weight:700">⏰ ${fmtDate(i.deadline)}</span>`:'<span class="meta-tag" style="background:#FEF3C7;color:#92400E">⏰ No deadline</span>'}
+      ${i.people?avatarStack(i.people):''}
     </div>
+    ${i.deliverables?`<div class="card-info-line"><span class="il-label">📦 Deliverables:</span> ${esc(i.deliverables)}</div>`:''}
     ${i.currentPhase?`<div class="card-info-line"><span class="il-label">📍 Phase:</span> ${esc(i.currentPhase)}</div>`:''}
     ${i.nextAction?`<div class="card-info-line"><span class="il-label">⚡ Next:</span> ${esc(i.nextAction)}</div>`:''}
     ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
@@ -715,11 +799,11 @@ function retainerCard(i){
     </div>
     <div class="card-meta">
       ${pdot(i.priority)}
+      ${i.deadline?`<span class="meta-tag" style="background:#FEE2E2;color:#991B1B;font-weight:700">⏰ ${fmtDate(i.deadline)}</span>`:'<span class="meta-tag" style="background:#FEF3C7;color:#92400E">⏰ No deadline</span>'}
       ${i.fee?`<span class="meta-tag">💰 ${esc(i.fee)}</span>`:''}
-      ${i.contactPerson?`<span class="meta-tag">👤 ${esc(i.contactPerson)}</span>`:''}
-      ${i.nextBilling?`<span class="meta-tag">📅 Billing: ${fmtDate(i.nextBilling)}</span>`:''}
+      ${i.people?avatarStack(i.people):''}
     </div>
-    ${i.monthlyDeliverables?`<div class="card-info-line"><span class="il-label">📦 Monthly:</span> ${esc(i.monthlyDeliverables)}</div>`:''}
+    ${i.monthlyDeliverables?`<div class="card-info-line"><span class="il-label">📦 Deliverables:</span> ${esc(i.monthlyDeliverables)}</div>`:''}
     ${i.thisMonthUpdate?`<div class="card-info-line"><span class="il-label">📊 This month:</span> ${esc(i.thisMonthUpdate)}</div>`:''}
     ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
     ${cardFooter('retainers',i.id,i.status)}
@@ -739,10 +823,11 @@ function mdCard(i){
     <div class="card-meta">
       ${i.platform?`<span class="meta-tag">📺 ${esc(i.platform)}</span>`:''}
       ${pdot(i.priority)}
+      ${i.deadline?`<span class="meta-tag" style="background:#FEE2E2;color:#991B1B;font-weight:700">⏰ ${fmtDate(i.deadline)}</span>`:'<span class="meta-tag" style="background:#FEF3C7;color:#92400E">⏰ No deadline</span>'}
       ${epStr?`<span class="meta-tag">🎬 ${epStr}</span>`:''}
-      ${i.writer?`<span class="meta-tag">✍️ ${esc(i.writer)}</span>`:''}
-      ${i.director?`<span class="meta-tag">🎥 ${esc(i.director)}</span>`:''}
+      ${i.people?avatarStack(i.people):''}
     </div>
+    ${i.deliverables?`<div class="card-info-line"><span class="il-label">📦 Deliverables:</span> ${esc(i.deliverables)}</div>`:''}
     ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
     ${cardFooter('microdramas',i.id,i.status)}
   </div>`;
@@ -772,8 +857,10 @@ const FORMS = {
       <div class="form-group"><label class="form-label">Deadline</label>
         <input type="date" class="form-input" id="f_deadline" value="${item?.deadline||''}"></div>
     </div>
-    <div class="form-group"><label class="form-label">Team Lead</label>
-      <input class="form-input" id="f_teamLead" value="${esc(item?.teamLead||'')}" placeholder="Name"></div>
+    <div class="form-group"><label class="form-label">Deliverables</label>
+      <input class="form-input" id="f_deliverables" value="${esc(item?.deliverables||'')}" placeholder="e.g. 4 reels, 2 scripts"></div>
+    <div class="form-group"><label class="form-label">People involved (comma separated)</label>
+      <input class="form-input" id="f_people" value="${esc(item?.people||'')}" placeholder="e.g. Rohit, Srestha, Apoorv"></div>
     <div class="form-group"><label class="form-label">Notes / Updates</label>
       <textarea class="form-textarea" id="f_notes" placeholder="Latest updates, blockers…">${esc(item?.notes||'')}</textarea></div>`;
   },
@@ -802,6 +889,10 @@ const FORMS = {
       <div class="form-group"><label class="form-label">Deadline</label>
         <input type="date" class="form-input" id="f_deadline" value="${item?.deadline||''}"></div>
     </div>
+    <div class="form-group"><label class="form-label">Deliverables</label>
+      <input class="form-input" id="f_deliverables" value="${esc(item?.deliverables||'')}" placeholder="e.g. 4 UGC videos, 2 reels"></div>
+    <div class="form-group"><label class="form-label">People involved (comma separated)</label>
+      <input class="form-input" id="f_people" value="${esc(item?.people||'')}" placeholder="e.g. Rohit, Srestha, Apoorv"></div>
     <div class="form-group"><label class="form-label">Notes</label>
       <textarea class="form-textarea" id="f_notes" placeholder="Context, feedback, blockers…">${esc(item?.notes||'')}</textarea></div>`;
   },
@@ -814,7 +905,7 @@ const FORMS = {
       <div class="form-group"><label class="form-label">Status</label>
         <select class="form-select" id="f_status">${STATUSES.retainers.map(s=>`<option${item?.status===s?' selected':''}>${s}</option>`).join('')}</select></div>
     </div>
-    <div class="form-group"><label class="form-label">Monthly Deliverables</label>
+    <div class="form-group"><label class="form-label">Deliverables</label>
       <input class="form-input" id="f_monthlyDeliverables" value="${esc(item?.monthlyDeliverables||'')}" placeholder="e.g. 10 Reels, 20 Posts"></div>
     <div class="form-group"><label class="form-label">This Month's Update</label>
       <textarea class="form-textarea" id="f_thisMonthUpdate" placeholder="Current status for this month…">${esc(item?.thisMonthUpdate||'')}</textarea></div>
@@ -830,6 +921,14 @@ const FORMS = {
       <div class="form-group"><label class="form-label">Priority</label>
         <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
     </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Deadline</label>
+        <input type="date" class="form-input" id="f_deadline" value="${item?.deadline||''}" ></div>
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}}>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">People involved (comma separated)</label>
+      <input class="form-input" id="f_people" value="${esc(item?.people||'')}" placeholder="e.g. Rohit, Srestha, Apoorv"></div>
     <div class="form-group"><label class="form-label">Notes</label>
       <textarea class="form-textarea" id="f_notes" placeholder="Additional context…">${esc(item?.notes||'')}</textarea></div>`;
   },
@@ -863,7 +962,13 @@ const FORMS = {
     <div class="form-row">
       <div class="form-group"><label class="form-label">Priority</label>
         <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Deadline</label>
+        <input type="date" class="form-input" id="f_deadline" value="${item?.deadline||''}"></div>
     </div>
+    <div class="form-group"><label class="form-label">Deliverables</label>
+      <input class="form-input" id="f_deliverables" value="${esc(item?.deliverables||'')}" placeholder="e.g. 8 episodes, trailer"></div>
+    <div class="form-group"><label class="form-label">People involved (comma separated)</label>
+      <input class="form-input" id="f_people" value="${esc(item?.people||'')}" placeholder="e.g. Rohit, Srestha, Apoorv"></div>
     <div class="form-group"><label class="form-label">Notes / Concept</label>
       <textarea class="form-textarea" id="f_notes" placeholder="Story, concept, blockers, next steps…">${esc(item?.notes||'')}</textarea></div>`;
   }
@@ -892,18 +997,20 @@ async function saveEntry(){
   const getters = {
     studio:()=>({client:gv('f_client'),projectName:gv('f_projectName'),type:gv('f_type'),
       status:gv('f_status'),priority:gv('f_priority'),deadline:gv('f_deadline'),
-      teamLead:gv('f_teamLead'),notes:gv('f_notes')}),
+      deliverables:gv('f_deliverables'),people:gv('f_people'),notes:gv('f_notes')}),
     contracts:()=>({client:gv('f_client'),projectName:gv('f_projectName'),type:gv('f_type'),
       status:gv('f_status'),currentPhase:gv('f_currentPhase'),nextAction:gv('f_nextAction'),
-      deadline:gv('f_deadline'),priority:gv('f_priority'),notes:gv('f_notes')}),
+      deadline:gv('f_deadline'),priority:gv('f_priority'),
+      deliverables:gv('f_deliverables'),people:gv('f_people'),notes:gv('f_notes')}),
     retainers:()=>({client:gv('f_client'),status:gv('f_status'),
       monthlyDeliverables:gv('f_monthlyDeliverables'),thisMonthUpdate:gv('f_thisMonthUpdate'),
       fee:gv('f_fee'),nextBilling:gv('f_nextBilling'),contactPerson:gv('f_contactPerson'),
-      priority:gv('f_priority'),notes:gv('f_notes')}),
+      deadline:gv('f_deadline'),priority:gv('f_priority'),people:gv('f_people'),notes:gv('f_notes')}),
     microdramas:()=>({showName:gv('f_showName'),genre:gv('f_genre'),status:gv('f_status'),
       platform:gv('f_platform'),totalEpisodes:gv('f_totalEpisodes'),
       episodesProduced:gv('f_episodesProduced'),writer:gv('f_writer'),
-      director:gv('f_director'),priority:gv('f_priority'),notes:gv('f_notes')})
+      deadline:gv('f_deadline'),director:gv('f_director'),
+      deliverables:gv('f_deliverables'),people:gv('f_people'),priority:gv('f_priority'),notes:gv('f_notes')})
   };
   const newData = getters[tab]();
   if(editingId){
