@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atom — Studio Management</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5F4F0;--surface:#fff;--border:#E8E6DF;
+  --text:#1C1C1E;--muted:#6B6B6B;--accent:#E8402A;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+.header{background:#1C1C1E;color:#fff;padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{font-size:17px;font-weight:800;letter-spacing:-0.5px}
+.logo em{color:var(--accent);font-style:normal}
+.header-meta{font-size:12px;color:rgba(255,255,255,0.4);display:flex;gap:16px;align-items:center}
+.export-btn{background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.7);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:background 0.15s}
+.export-btn:hover{background:rgba(255,255,255,0.2)}
+
+/* TABS */
+.tab-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;overflow-x:auto;gap:0;position:sticky;top:56px;z-index:100}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{padding:14px 18px;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--text);border-bottom-color:#1C1C1E}
+.tab-icon{font-size:14px}
+.tab-count{background:#F0EEE8;color:var(--muted);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+.tab-btn.active .tab-count{background:#1C1C1E;color:#fff}
+
+/* MAIN */
+.main{padding:28px;max-width:1200px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* SECTION HEADER */
+.section-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+.section-title{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.section-subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.search-input{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;width:200px;outline:none;background:var(--surface);font-family:inherit;transition:border-color 0.15s}
+.search-input:focus{border-color:#1C1C1E}
+.btn-add{background:#1C1C1E;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:opacity 0.15s;white-space:nowrap;font-family:inherit}
+.btn-add:hover{opacity:0.8}
+
+/* STATS */
+.stats-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:10px}
+.stat-num{font-size:22px;font-weight:800;letter-spacing:-1px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;line-height:1.3}
+
+/* FILTERS */
+.filter-bar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.filter-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s}
+.filter-chip:hover,.filter-chip.active{background:#1C1C1E;color:#fff;border-color:#1C1C1E}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;transition:box-shadow 0.15s;position:relative}
+.card:hover{box-shadow:0 4px 24px rgba(0,0,0,0.07)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:3px}
+.card-title{font-size:15px;font-weight:700;letter-spacing:-0.3px;line-height:1.2}
+.status-badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0;margin-left:8px;letter-spacing:0.2px}
+
+/* Status colors */
+.s-prospecting{background:#EDE9FE;color:#5B21B6}
+.s-planning{background:#FEF3C7;color:#92400E}
+.s-planning-next{background:#FEF3C7;color:#92400E}
+.s-in-progress{background:#D1FAE5;color:#065F46}
+.s-review{background:#DBEAFE;color:#1E40AF}
+.s-completed{background:#F3F4F6;color:#374151}
+.s-on-hold{background:#FEE2E2;color:#991B1B}
+.s-active{background:#D1FAE5;color:#065F46}
+.s-paused{background:#FEF3C7;color:#92400E}
+.s-development{background:#EDE9FE;color:#5B21B6}
+.s-pre-production{background:#FEF3C7;color:#92400E}
+.s-production{background:#D1FAE5;color:#065F46}
+.s-post-production{background:#DBEAFE;color:#1E40AF}
+.s-released{background:#F3F4F6;color:#374151}
+.s-ended{background:#F3F4F6;color:#374151}
+
+.card-meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.meta-tag{font-size:11px;color:var(--muted);background:#F8F7F4;padding:3px 8px;border-radius:5px;display:flex;align-items:center;gap:3px}
+.meta-tag strong{color:var(--text)}
+
+.card-info-line{font-size:12px;color:var(--text);line-height:1.5;padding:3px 0;display:flex;gap:5px}
+.card-info-line .il-label{color:var(--muted);flex-shrink:0}
+
+.card-notes{font-size:12px;color:var(--muted);line-height:1.55;border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
+
+.card-footer{display:flex;gap:6px;margin-top:12px;align-items:center}
+.status-select{font-size:11px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;outline:none;color:var(--text);font-family:inherit;flex:1;max-width:160px}
+.btn-edit,.btn-delete{font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text);transition:all 0.15s;font-family:inherit}
+.btn-edit:hover{background:#F0EEE8}
+.btn-delete:hover{background:#FEE2E2;border-color:#FECACA;color:#991B1B}
+
+/* Priority dot */
+.p-dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.p-high{background:#EF4444}.p-medium{background:#F59E0B}.p-low{background:#10B981}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty-state h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px}
+.empty-state p{font-size:13px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;backdrop-filter:blur(2px)}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border-radius:16px;padding:26px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;transform:translateY(16px);transition:transform 0.2s;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:18px;letter-spacing:-0.4px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--text);background:#FAFAF8;transition:border-color 0.15s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#1C1C1E;background:#fff}
+.form-textarea{min-height:76px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.btn-cancel{padding:9px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;cursor:pointer;font-family:inherit}
+.btn-cancel:hover{background:var(--bg)}
+.btn-save{padding:9px 18px;border:none;border-radius:8px;background:#1C1C1E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-save:hover{opacity:0.85}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:all 0.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Divider line in card */
+.card-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+
+@media(max-width:600px){
+  .main{padding:16px}
+  .header{padding:0 16px}
+  .tab-nav{padding:0 12px}
+  .cards-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .stats-bar{gap:8px}
+  .search-input{width:140px}
+  .section-header{gap:8px}
+}
+
+/* ── PIN GATE ── */
+#pinGate{
+  position:fixed;inset:0;background:#1C1C1E;z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:0;
+}
+.pin-box{
+  background:#fff;border-radius:20px;padding:40px 36px 32px;
+  width:100%;max-width:360px;text-align:center;
+  box-shadow:0 32px 80px rgba(0,0,0,0.4);
+}
+.pin-logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:#1C1C1E;margin-bottom:6px}
+.pin-logo em{color:var(--accent);font-style:normal}
+.pin-sub{font-size:12px;color:var(--muted);margin-bottom:28px}
+.pin-input{
+  width:100%;padding:14px 16px;border:2px solid var(--border);
+  border-radius:10px;font-size:18px;text-align:center;letter-spacing:4px;
+  font-family:inherit;outline:none;transition:border-color 0.15s;
+  background:#FAFAF8;color:#1C1C1E;
+}
+.pin-input:focus{border-color:#1C1C1E}
+.pin-input.shake{animation:shake 0.35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.pin-error{color:#DC2626;font-size:12px;margin-top:8px;height:16px;transition:opacity 0.2s}
+.pin-btn{
+  width:100%;margin-top:16px;padding:13px;border:none;border-radius:10px;
+  background:#1C1C1E;color:#fff;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity 0.15s;
+}
+.pin-btn:hover{opacity:0.85}
+.pin-footer{font-size:11px;color:rgba(255,255,255,0.25);margin-top:20px}
+
+/* ── CONNECT STATUS DOT ── */
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sync-dot.green{background:#22C55E;box-shadow:0 0 0 2px rgba(34,197,94,0.3)}
+.sync-dot.red{background:#EF4444;box-shadow:0 0 0 2px rgba(239,68,68,0.3)}
+.sync-dot.yellow{background:#F59E0B;box-shadow:0 0 0 2px rgba(245,158,11,0.3)}
+.conn-wrap{display:flex;align-items:center;gap:6px;cursor:pointer}
+.conn-wrap:hover .sync-status{text-decoration:underline}
+
+/* ── SETUP BANNER (shown when URL not configured) ── */
+#setupBanner{
+  background:#FEF3C7;border-bottom:1px solid #FDE68A;
+  padding:10px 28px;font-size:12px;color:#92400E;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+#setupBanner a{color:#92400E;font-weight:700}
+#setupBanner.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- PIN GATE -->
+<div id="pinGate">
+  <div class="pin-box">
+    <div class="pin-logo">atom<em>.</em></div>
+    <div class="pin-sub">CHOPSHOPLAB Studio · Enter team PIN to continue</div>
+    <input class="pin-input" id="pinInput" type="password" placeholder="••••••"
+      maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')checkPin()">
+    <div class="pin-error" id="pinError"></div>
+    <button class="pin-btn" onclick="checkPin()">Enter Studio →</button>
+  </div>
+  <div class="pin-footer">chopshoplab.com · internal tool</div>
+</div>
+
+<!-- SETUP BANNER (auto-hides when configured) -->
+<div id="setupBanner" class="hidden">
+  ⚠️ Supabase not connected — data saves locally only.
+  <span>Open the HTML file and paste your <strong>SUPABASE_URL</strong> and <strong>SUPABASE_KEY</strong> at the top of the script.</span>
+</div>
+
+<div class="header">
+  <div class="logo">atom<em>.</em></div>
+  <div class="header-meta">
+    <div class="conn-wrap" onclick="testConnection()" title="Click to test connection">
+      <span class="sync-dot yellow" id="syncDot"></span>
+      <span class="sync-status" id="lastSaved">Connecting…</span>
+    </div>
+    <button class="export-btn" onclick="exportData()">Export JSON</button>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('studio')" id="tab-studio">
+    <span class="tab-icon">🎬</span> Content Studio <span class="tab-count" id="count-studio">0</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('contracts')" id="tab-contracts">
+    <span class="tab-icon">📋</span> Contracts <span class="tab-count" id="count-contracts">0</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('retainers')" id="tab-retainers">
+    <span class="tab-icon">📱</span> All Things Social <span class="tab-count" id="count-retainers">0</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('microdramas')" id="tab-microdramas">
+    <span class="tab-icon">🎭</span> Microdramas &amp; Shows <span class="tab-count" id="count-microdramas">0</span>
+  </button>
+</div>
+
+<div class="main">
+
+  <!-- CONTENT STUDIO -->
+  <div id="panel-studio" class="tab-panel active">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Content Studio</div>
+        <div class="section-subtitle">One-off campaigns &amp; projects</div>
+      </div>
+      <div class="header-actions">
+        <input type="text" class="search-input" placeholder="Search…" id="search-studio" oninput="renderAll()">
+        <button class="btn-add" onclick="openModal('studio')">+ Add Project</button>
+      </div>
+    </div>
+    <div class="stats-bar" id="stats-studio"></div>
+    <div class="filter-bar" id="filters-studio"></div>
+    <div class="cards-grid" id="cards-studio"></div>
+  </div>
+
+  <!-- CONTRACTS -->
+  <div id="panel-contracts" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Contracts &amp; Mandates</div>
+        <div class="section-subtitle">Active contractual work</div>
+      </div>
+      <div class="header-actions">
+        <input type="text" class="search-input" placeholder="Search…" id="search-contracts" oninput="renderAll()">
+        <button class="btn-add" onclick="openModal('contracts')">+ Add Contract</button>
+      </div>
+    </div>
+    <div class="stats-bar" id="stats-contracts"></div>
+    <div class="filter-bar" id="filters-contracts"></div>
+    <div class="cards-grid" id="cards-contracts"></div>
+  </div>
+
+  <!-- RETAINERS -->
+  <div id="panel-retainers" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">All Things Social</div>
+        <div class="section-subtitle">Full-time retainer clients</div>
+      </div>
+      <div class="header-actions">
+        <input type="text" class="search-input" placeholder="Search…" id="search-retainers" oninput="renderAll()">
+        <button class="btn-add" onclick="openModal('retainers')">+ Add Retainer</button>
+      </div>
+    </div>
+    <div class="stats-bar" id="stats-retainers"></div>
+    <div class="filter-bar" id="filters-retainers"></div>
+    <div class="cards-grid" id="cards-retainers"></div>
+  </div>
+
+  <!-- MICRODRAMAS -->
+  <div id="panel-microdramas" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Microdramas &amp; Shows</div>
+        <div class="section-subtitle">IP Series in development &amp; production</div>
+      </div>
+      <div class="header-actions">
+        <input type="text" class="search-input" placeholder="Search…" id="search-microdramas" oninput="renderAll()">
+        <button class="btn-add" onclick="openModal('microdramas')">+ Add Show</button>
+      </div>
+    </div>
+    <div class="stats-bar" id="stats-microdramas"></div>
+    <div class="filter-bar" id="filters-microdramas"></div>
+    <div class="cards-grid" id="cards-microdramas"></div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-title" id="modalTitle">Add Entry</div>
+    <div id="modalForm"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEntry()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+//  CONFIG
+// ============================================================
+const STATUSES = {
+  studio:      ['Prospecting','Planning','In Progress','Review','Completed','On Hold'],
+  contracts:   ['Prospecting','Active','In Progress','Review / Feedback','Completed','Paused'],
+  retainers:   ['Active','Planning Next Month','Paused','Ended','Prospecting'],
+  microdramas: ['Development','Pre-Production','Production','Post-Production','Released','On Hold']
+};
+
+const STATUS_CLASS = {
+  'Prospecting':'prospecting','Planning':'planning','Planning Next Month':'planning-next',
+  'In Progress':'in-progress','Active':'active','Review':'review',
+  'Review / Feedback':'review','Completed':'completed','Released':'released',
+  'On Hold':'on-hold','Paused':'paused','Development':'development',
+  'Pre-Production':'pre-production','Production':'production',
+  'Post-Production':'post-production','Ended':'ended'
+};
+
+const PRIORITY = ['High','Medium','Low'];
+
+// ============================================================
+//  DEFAULT SEED DATA
+// ============================================================
+const SEED = {
+  studio: [],
+  contracts: [
+    {id:'c1',client:'Shaadi.com',projectName:'UGC Content Campaign',type:'UGC / Influencer',
+     status:'In Progress',currentPhase:'Script development & refinement; casting underway',
+     nextAction:'Finalize scripts based on feedback, complete casting',
+     deadline:'',priority:'High',
+     notes:'Ongoing iterations based on client feedback. Script refinement active.',
+     createdAt:new Date().toISOString()},
+
+    {id:'c2',client:'XYXX',projectName:'Brand Creator Campaign',type:'Creator / Influencer',
+     status:'In Progress',currentPhase:'Casting awaiting client approval. Scripts aligned with approved concepts.',
+     nextAction:'Lock creators & concepts this week → Shoot next week',
+     deadline:'',priority:'High',
+     notes:'Time-sensitive: creators and concepts must be locked ASAP to hit shoot window next week.',
+     createdAt:new Date().toISOString()},
+
+    {id:'c3',client:'PayTM Assured',projectName:'UGC Video Series',type:'UGC / Performance',
+     status:'In Progress',currentPhase:'UGC-style video development in progress',
+     nextAction:'Deliver UGC videos per client brief',
+     deadline:'',priority:'Medium',
+     notes:'Focus on relatability and quick-turnaround formats, aligned with client requirements.',
+     createdAt:new Date().toISOString()},
+
+    {id:'c4',client:'Sonal IP',projectName:'Script Development',type:'Script / Creative',
+     status:'In Progress',currentPhase:'All scripts in process',
+     nextAction:'Lock all scripts by Tuesday',
+     deadline:'',priority:'High',
+     notes:'Scripts scheduled to be locked by Tuesday.',
+     createdAt:new Date().toISOString()},
+
+    {id:'c5',client:'Freedm',projectName:'New Business Proposal',type:'New Business',
+     status:'Prospecting',currentPhase:'Proposal stage',
+     nextAction:'Send proposal to client',
+     deadline:'',priority:'Medium',
+     notes:'Proposal to be sent.',
+     createdAt:new Date().toISOString()}
+  ],
+  retainers: [
+    {id:'r1',client:'Karya',monthlyDeliverables:'Monthly social content package',
+     status:'Planning Next Month',contactPerson:'',
+     thisMonthUpdate:'This month\'s deliverables already delivered ✓',
+     nextBilling:'',fee:'',priority:'High',
+     notes:'Planning for the upcoming month to begin shortly.',
+     createdAt:new Date().toISOString()},
+
+    {id:'r2',client:'Sonic Lamb',monthlyDeliverables:'10 videos per month',
+     status:'Active',contactPerson:'',
+     thisMonthUpdate:'Content production ongoing — target 10 videos/month.',
+     nextBilling:'',fee:'',priority:'High',
+     notes:'Focus on maintaining consistency in output while ensuring quality across all assets.',
+     createdAt:new Date().toISOString()},
+
+    {id:'r3',client:'True Black Coffee',monthlyDeliverables:'Strategy & social content',
+     status:'Prospecting',contactPerson:'',
+     thisMonthUpdate:'Strategy and concept development in progress.',
+     nextBilling:'',fee:'',priority:'Medium',
+     notes:'Pitch scheduled for next week following initial discussion.',
+     createdAt:new Date().toISOString()}
+  ],
+  microdramas: []
+};
+
+// ============================================================
+//  ★  YOUR 3-LINE SETUP  ★
+//  1. Paste your Supabase URL
+//  2. Paste your Supabase anon key
+//  3. Set your team PIN (share this with your team, keep it simple)
+// ============================================================
+const SUPABASE_URL = 'https://rkobolostvmrzpdsocaz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrb2JvbG9zdHZtcnpwZHNvY2F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MDk5NjMsImV4cCI6MjA5MjA4NTk2M30.bLcyfzS1g9ol-eKD7BRzYyX1RXQrrkzYxgaY-nh0iJs';
+const TEAM_PIN     = 'chopshop';
+// ============================================================
+//  PIN GATE
+// ============================================================
+function checkPin(){
+  const val = document.getElementById('pinInput').value.trim();
+  if(val === TEAM_PIN){
+    sessionStorage.setItem('atomAuth','1');
+    document.getElementById('pinGate').style.display = 'none';
+    init();
+  } else {
+    const inp = document.getElementById('pinInput');
+    const err = document.getElementById('pinError');
+    err.textContent = 'Wrong PIN — try again';
+    inp.classList.remove('shake');
+    void inp.offsetWidth; // reflow to restart animation
+    inp.classList.add('shake');
+    inp.value = '';
+    setTimeout(()=>{ err.textContent=''; inp.classList.remove('shake'); }, 2000);
+  }
+}
+
+// ============================================================
+//  SUPABASE
+// ============================================================
+const IS_CONFIGURED = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+
+const SB_HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'resolution=merge-duplicates'
+};
+const SECTIONS = ['studio','contracts','retainers','microdramas'];
+
+function setSyncStatus(state, msg){
+  const dot  = document.getElementById('syncDot');
+  const txt  = document.getElementById('lastSaved');
+  dot.className = 'sync-dot ' + state; // green | red | yellow
+  if(txt) txt.textContent = msg;
+}
+
+async function testConnection(){
+  if(!IS_CONFIGURED){ setSyncStatus('red','Not configured'); return; }
+  setSyncStatus('yellow','Testing…');
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/atom_state?limit=1`, {headers: SB_HEADERS});
+    if(res.ok){ setSyncStatus('green','Connected ✓'); toast('✅ Supabase connected!'); }
+    else       { setSyncStatus('red','Error ' + res.status); toast('❌ Connection failed: ' + res.status); }
+  }catch(e){
+    setSyncStatus('red','Unreachable');
+    toast('❌ Cannot reach Supabase — check URL');
+  }
+}
+
+async function loadData(){
+  if(!IS_CONFIGURED){
+    document.getElementById('setupBanner').classList.remove('hidden');
+    setSyncStatus('red','Not connected');
+    // fallback: localStorage
+    try{ const s=localStorage.getItem('atomStudio_v2'); if(s) return JSON.parse(s); }catch(e){}
+    return JSON.parse(JSON.stringify(SEED));
+  }
+  setSyncStatus('yellow','Loading…');
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/atom_state?select=*`, {headers: SB_HEADERS});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await res.json();
+    const out = {studio:[],contracts:[],retainers:[],microdramas:[]};
+    rows.forEach(r=>{ if(out.hasOwnProperty(r.key)) out[r.key] = r.value; });
+    if(rows.length === 0){
+      // First ever load — seed the database
+      DATA = JSON.parse(JSON.stringify(SEED));
+      await saveData(true);
+      return DATA;
+    }
+    setSyncStatus('green','Synced');
+    return out;
+  }catch(e){
+    setSyncStatus('red','Offline');
+    toast('⚠️ Could not load — showing local data');
+    try{ const s=localStorage.getItem('atomStudio_v2'); if(s) return JSON.parse(s); }catch(e2){}
+    return JSON.parse(JSON.stringify(SEED));
+  }
+}
+
+async function saveData(silent=false){
+  // Always save locally as backup
+  localStorage.setItem('atomStudio_v2', JSON.stringify(DATA));
+  if(!IS_CONFIGURED){
+    const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setSyncStatus('yellow','Local only · '+t);
+    return;
+  }
+  setSyncStatus('yellow','Saving…');
+  try{
+    const body = SECTIONS.map(key => ({key, value: DATA[key]}));
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/atom_state`, {
+      method:'POST', headers:SB_HEADERS, body:JSON.stringify(body)
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setSyncStatus('green','Synced '+t);
+    if(!silent) toast('✅ Saved & synced');
+  }catch(e){
+    setSyncStatus('red','Sync failed');
+    toast('⚠️ Sync failed — saved locally');
+  }
+}
+
+// ============================================================
+//  STATE
+// ============================================================
+let currentTab = 'studio';
+let editingId   = null;
+let editingTab  = null;
+let activeFilters = {studio:'All',contracts:'All',retainers:'All',microdramas:'All'};
+let DATA = {studio:[],contracts:[],retainers:[],microdramas:[]};
+
+// ============================================================
+//  UTILS
+// ============================================================
+function uid(){ return 'i' + Date.now() + Math.random().toString(36).slice(2,6); }
+function fmtDate(s){
+  if(!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+function gv(id){ const e=document.getElementById(id); return e?e.value.trim():''; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ============================================================
+//  RENDER
+// ============================================================
+function renderAll(){
+  ['studio','contracts','retainers','microdramas'].forEach(t => renderTab(t));
+  updateCounts();
+}
+
+function updateCounts(){
+  ['studio','contracts','retainers','microdramas'].forEach(t=>{
+    document.getElementById('count-'+t).textContent = DATA[t].length;
+  });
+}
+
+function renderTab(tab){
+  const all = DATA[tab];
+  renderStats(tab, all);
+  renderFilters(tab, all);
+  const filtered = getFiltered(tab);
+  const el = document.getElementById('cards-'+tab);
+  if(!filtered.length){
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>Nothing here yet</h3>
+      <p>Click "+ Add" to create your first entry.</p>
+    </div>`;
+    return;
+  }
+  const fns = {studio:studioCard,contracts:contractCard,retainers:retainerCard,microdramas:mdCard};
+  el.innerHTML = filtered.map(i=>fns[tab](i)).join('');
+}
+
+function renderStats(tab, items){
+  const el = document.getElementById('stats-'+tab);
+  const active = items.filter(i=>!['Completed','Released','Ended','On Hold','Paused'].includes(i.status)).length;
+  const high   = items.filter(i=>i.priority==='High').length;
+  const done   = items.filter(i=>['Completed','Released'].includes(i.status)).length;
+
+  let h = '';
+  h += pill(items.length,'Total','#1C1C1E');
+  h += pill(active,'Active','#059669');
+  if(high) h += pill(high,'High Priority','#DC2626');
+  if(done) h += pill(done,'Completed','#9CA3AF');
+  el.innerHTML = h;
+}
+
+function pill(n,label,color){
+  return `<div class="stat-pill">
+    <div class="stat-num" style="color:${color}">${n}</div>
+    <div class="stat-label">${label}</div>
+  </div>`;
+}
+
+function renderFilters(tab, items){
+  const el = document.getElementById('filters-'+tab);
+  const all = ['All',...STATUSES[tab]];
+  const counts = {};
+  all.forEach(s=> counts[s] = s==='All' ? items.length : items.filter(i=>i.status===s).length);
+
+  el.innerHTML = all
+    .filter(s=> s==='All' || counts[s]>0)
+    .map(s=>`<button class="filter-chip ${activeFilters[tab]===s?'active':''}"
+      onclick="setFilter('${tab}','${esc(s)}')">${esc(s)} <span style="opacity:0.55">${counts[s]}</span></button>`)
+    .join('');
+}
+
+function setFilter(tab,status){
+  activeFilters[tab]=status;
+  renderAll();
+}
+
+function getFiltered(tab){
+  let items = DATA[tab];
+  const af = activeFilters[tab];
+  if(af!=='All') items = items.filter(i=>i.status===af);
+  const q = (document.getElementById('search-'+tab)?.value||'').toLowerCase();
+  if(q) items = items.filter(i=>JSON.stringify(i).toLowerCase().includes(q));
+  return items;
+}
+
+// STATUS BADGE HELPER
+function badge(status){
+  const cls = STATUS_CLASS[status]||'planning';
+  return `<span class="status-badge s-${cls}">${esc(status)}</span>`;
+}
+
+// PRIORITY DOT
+function pdot(p){
+  if(!p) return '';
+  return `<span class="meta-tag"><span class="p-dot p-${p.toLowerCase()}"></span>${esc(p)}</span>`;
+}
+
+// CARD FOOTER
+function cardFooter(tab,id,status){
+  const opts = STATUSES[tab].map(s=>`<option${s===status?' selected':''}>${esc(s)}</option>`).join('');
+  return `<div class="card-footer">
+    <select class="status-select" onchange="quickStatus('${tab}','${id}',this.value)">${opts}</select>
+    <button class="btn-edit" onclick="openModal('${tab}','${id}')">Edit</button>
+    <button class="btn-delete" onclick="deleteEntry('${tab}','${id}')">✕</button>
+  </div>`;
+}
+
+// ============================================================
+//  CARD TEMPLATES
+// ============================================================
+function studioCard(i){
+  return `<div class="card">
+    <div class="card-top">
+      <div>
+        <div class="card-label">${esc(i.client||'Client')}</div>
+        <div class="card-title">${esc(i.projectName||'Untitled')}</div>
+      </div>
+      ${badge(i.status)}
+    </div>
+    <div class="card-meta">
+      ${i.type?`<span class="meta-tag">🎬 ${esc(i.type)}</span>`:''}
+      ${pdot(i.priority)}
+      ${i.deadline?`<span class="meta-tag">📅 ${fmtDate(i.deadline)}</span>`:''}
+      ${i.teamLead?`<span class="meta-tag">👤 ${esc(i.teamLead)}</span>`:''}
+    </div>
+    ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
+    ${cardFooter('studio',i.id,i.status)}
+  </div>`;
+}
+
+function contractCard(i){
+  return `<div class="card">
+    <div class="card-top">
+      <div>
+        <div class="card-label">${esc(i.client||'Client')}</div>
+        <div class="card-title">${esc(i.projectName||'Untitled')}</div>
+      </div>
+      ${badge(i.status)}
+    </div>
+    <div class="card-meta">
+      ${i.type?`<span class="meta-tag">📁 ${esc(i.type)}</span>`:''}
+      ${pdot(i.priority)}
+      ${i.deadline?`<span class="meta-tag">📅 ${fmtDate(i.deadline)}</span>`:''}
+    </div>
+    ${i.currentPhase?`<div class="card-info-line"><span class="il-label">📍 Phase:</span> ${esc(i.currentPhase)}</div>`:''}
+    ${i.nextAction?`<div class="card-info-line"><span class="il-label">⚡ Next:</span> ${esc(i.nextAction)}</div>`:''}
+    ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
+    ${cardFooter('contracts',i.id,i.status)}
+  </div>`;
+}
+
+function retainerCard(i){
+  return `<div class="card">
+    <div class="card-top">
+      <div>
+        <div class="card-label">Retainer</div>
+        <div class="card-title">${esc(i.client||'Untitled')}</div>
+      </div>
+      ${badge(i.status)}
+    </div>
+    <div class="card-meta">
+      ${pdot(i.priority)}
+      ${i.fee?`<span class="meta-tag">💰 ${esc(i.fee)}</span>`:''}
+      ${i.contactPerson?`<span class="meta-tag">👤 ${esc(i.contactPerson)}</span>`:''}
+      ${i.nextBilling?`<span class="meta-tag">📅 Billing: ${fmtDate(i.nextBilling)}</span>`:''}
+    </div>
+    ${i.monthlyDeliverables?`<div class="card-info-line"><span class="il-label">📦 Monthly:</span> ${esc(i.monthlyDeliverables)}</div>`:''}
+    ${i.thisMonthUpdate?`<div class="card-info-line"><span class="il-label">📊 This month:</span> ${esc(i.thisMonthUpdate)}</div>`:''}
+    ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
+    ${cardFooter('retainers',i.id,i.status)}
+  </div>`;
+}
+
+function mdCard(i){
+  const epStr = i.totalEpisodes ? `${i.episodesProduced||0}/${i.totalEpisodes} eps` : '';
+  return `<div class="card">
+    <div class="card-top">
+      <div>
+        <div class="card-label">${esc(i.genre||'Show')}</div>
+        <div class="card-title">${esc(i.showName||'Untitled')}</div>
+      </div>
+      ${badge(i.status)}
+    </div>
+    <div class="card-meta">
+      ${i.platform?`<span class="meta-tag">📺 ${esc(i.platform)}</span>`:''}
+      ${pdot(i.priority)}
+      ${epStr?`<span class="meta-tag">🎬 ${epStr}</span>`:''}
+      ${i.writer?`<span class="meta-tag">✍️ ${esc(i.writer)}</span>`:''}
+      ${i.director?`<span class="meta-tag">🎥 ${esc(i.director)}</span>`:''}
+    </div>
+    ${i.notes?`<div class="card-notes">${esc(i.notes)}</div>`:''}
+    ${cardFooter('microdramas',i.id,i.status)}
+  </div>`;
+}
+
+// ============================================================
+//  MODAL FORMS
+// ============================================================
+const FORMS = {
+  studio(item){
+    return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Client</label>
+        <input class="form-input" id="f_client" value="${esc(item?.client||'')}" placeholder="e.g. Nike"></div>
+      <div class="form-group"><label class="form-label">Project Name</label>
+        <input class="form-input" id="f_projectName" value="${esc(item?.projectName||'')}" placeholder="e.g. Summer Campaign"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Type / Category</label>
+        <input class="form-input" id="f_type" value="${esc(item?.type||'')}" placeholder="e.g. UGC, Branded Content"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="f_status">${STATUSES.studio.map(s=>`<option${item?.status===s?' selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Deadline</label>
+        <input type="date" class="form-input" id="f_deadline" value="${item?.deadline||''}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Team Lead</label>
+      <input class="form-input" id="f_teamLead" value="${esc(item?.teamLead||'')}" placeholder="Name"></div>
+    <div class="form-group"><label class="form-label">Notes / Updates</label>
+      <textarea class="form-textarea" id="f_notes" placeholder="Latest updates, blockers…">${esc(item?.notes||'')}</textarea></div>`;
+  },
+
+  contracts(item){
+    return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Client</label>
+        <input class="form-input" id="f_client" value="${esc(item?.client||'')}" placeholder="Client name"></div>
+      <div class="form-group"><label class="form-label">Project / Campaign</label>
+        <input class="form-input" id="f_projectName" value="${esc(item?.projectName||'')}" placeholder="Project name"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Type</label>
+        <input class="form-input" id="f_type" value="${esc(item?.type||'')}" placeholder="e.g. UGC, Influencer, Script"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="f_status">${STATUSES.contracts.map(s=>`<option${item?.status===s?' selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Current Phase</label>
+      <input class="form-input" id="f_currentPhase" value="${esc(item?.currentPhase||'')}" placeholder="What's happening right now"></div>
+    <div class="form-group"><label class="form-label">Next Action</label>
+      <input class="form-input" id="f_nextAction" value="${esc(item?.nextAction||'')}" placeholder="What needs to happen next"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Deadline</label>
+        <input type="date" class="form-input" id="f_deadline" value="${item?.deadline||''}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="f_notes" placeholder="Context, feedback, blockers…">${esc(item?.notes||'')}</textarea></div>`;
+  },
+
+  retainers(item){
+    return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Client Name</label>
+        <input class="form-input" id="f_client" value="${esc(item?.client||'')}" placeholder="Brand name"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="f_status">${STATUSES.retainers.map(s=>`<option${item?.status===s?' selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Monthly Deliverables</label>
+      <input class="form-input" id="f_monthlyDeliverables" value="${esc(item?.monthlyDeliverables||'')}" placeholder="e.g. 10 Reels, 20 Posts"></div>
+    <div class="form-group"><label class="form-label">This Month's Update</label>
+      <textarea class="form-textarea" id="f_thisMonthUpdate" placeholder="Current status for this month…">${esc(item?.thisMonthUpdate||'')}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Monthly Fee</label>
+        <input class="form-input" id="f_fee" value="${esc(item?.fee||'')}" placeholder="e.g. ₹1,50,000"></div>
+      <div class="form-group"><label class="form-label">Next Billing Date</label>
+        <input type="date" class="form-input" id="f_nextBilling" value="${item?.nextBilling||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Contact Person</label>
+        <input class="form-input" id="f_contactPerson" value="${esc(item?.contactPerson||'')}" placeholder="Client POC"></div>
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="f_notes" placeholder="Additional context…">${esc(item?.notes||'')}</textarea></div>`;
+  },
+
+  microdramas(item){
+    return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Show Name</label>
+        <input class="form-input" id="f_showName" value="${esc(item?.showName||'')}" placeholder="e.g. The Last Call"></div>
+      <div class="form-group"><label class="form-label">Genre</label>
+        <input class="form-input" id="f_genre" value="${esc(item?.genre||'')}" placeholder="e.g. Drama, Comedy, Thriller"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="f_status">${STATUSES.microdramas.map(s=>`<option${item?.status===s?' selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Platform</label>
+        <input class="form-input" id="f_platform" value="${esc(item?.platform||'')}" placeholder="e.g. YouTube, Instagram"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Total Episodes</label>
+        <input type="number" class="form-input" id="f_totalEpisodes" value="${item?.totalEpisodes||''}" placeholder="e.g. 8" min="1"></div>
+      <div class="form-group"><label class="form-label">Episodes Produced</label>
+        <input type="number" class="form-input" id="f_episodesProduced" value="${item?.episodesProduced||''}" placeholder="e.g. 3" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Writer</label>
+        <input class="form-input" id="f_writer" value="${esc(item?.writer||'')}" placeholder="Writer name"></div>
+      <div class="form-group"><label class="form-label">Director</label>
+        <input class="form-input" id="f_director" value="${esc(item?.director||'')}" placeholder="Director name"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="form-select" id="f_priority">${PRIORITY.map(p=>`<option${item?.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes / Concept</label>
+      <textarea class="form-textarea" id="f_notes" placeholder="Story, concept, blockers, next steps…">${esc(item?.notes||'')}</textarea></div>`;
+  }
+};
+
+// ============================================================
+//  MODAL ACTIONS
+// ============================================================
+function openModal(tab, id=null){
+  editingTab = tab;
+  editingId  = id;
+  const item = id ? DATA[tab].find(i=>i.id===id) : null;
+  const labels = {studio:'Project',contracts:'Contract',retainers:'Retainer',microdramas:'Show'};
+  document.getElementById('modalTitle').textContent = (id?'Edit ':'Add ') + labels[tab];
+  document.getElementById('modalForm').innerHTML = FORMS[tab](item);
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  editingId = editingTab = null;
+}
+function overlayClick(e){ if(e.target===document.getElementById('overlay')) closeModal(); }
+
+async function saveEntry(){
+  const tab = editingTab;
+  const getters = {
+    studio:()=>({client:gv('f_client'),projectName:gv('f_projectName'),type:gv('f_type'),
+      status:gv('f_status'),priority:gv('f_priority'),deadline:gv('f_deadline'),
+      teamLead:gv('f_teamLead'),notes:gv('f_notes')}),
+    contracts:()=>({client:gv('f_client'),projectName:gv('f_projectName'),type:gv('f_type'),
+      status:gv('f_status'),currentPhase:gv('f_currentPhase'),nextAction:gv('f_nextAction'),
+      deadline:gv('f_deadline'),priority:gv('f_priority'),notes:gv('f_notes')}),
+    retainers:()=>({client:gv('f_client'),status:gv('f_status'),
+      monthlyDeliverables:gv('f_monthlyDeliverables'),thisMonthUpdate:gv('f_thisMonthUpdate'),
+      fee:gv('f_fee'),nextBilling:gv('f_nextBilling'),contactPerson:gv('f_contactPerson'),
+      priority:gv('f_priority'),notes:gv('f_notes')}),
+    microdramas:()=>({showName:gv('f_showName'),genre:gv('f_genre'),status:gv('f_status'),
+      platform:gv('f_platform'),totalEpisodes:gv('f_totalEpisodes'),
+      episodesProduced:gv('f_episodesProduced'),writer:gv('f_writer'),
+      director:gv('f_director'),priority:gv('f_priority'),notes:gv('f_notes')})
+  };
+  const newData = getters[tab]();
+  if(editingId){
+    const idx = DATA[tab].findIndex(i=>i.id===editingId);
+    if(idx>=0) DATA[tab][idx] = {...DATA[tab][idx],...newData};
+    toast('Entry updated');
+  } else {
+    DATA[tab].push({id:uid(),...newData,createdAt:new Date().toISOString()});
+    toast('Entry added');
+  }
+  await saveData(); renderAll(); closeModal();
+}
+
+async function deleteEntry(tab, id){
+  if(!confirm('Delete this entry? This cannot be undone.')) return;
+  DATA[tab] = DATA[tab].filter(i=>i.id!==id);
+  await saveData(); renderAll();
+  toast('Deleted');
+}
+
+async function quickStatus(tab, id, status){
+  const item = DATA[tab].find(i=>i.id===id);
+  if(item){ item.status=status; await saveData(); renderAll(); toast('Status updated'); }
+}
+
+// ============================================================
+//  TAB SWITCHING
+// ============================================================
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ============================================================
+//  EXPORT
+// ============================================================
+function exportData(){
+  const blob = new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'atom-studio-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  toast('Exported!');
+}
+
+// ============================================================
+//  KEYBOARD
+// ============================================================
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeModal();
+});
+
+// ============================================================
+//  INIT  (called after PIN is verified)
+// ============================================================
+async function init(){
+  DATA = await loadData();
+  renderAll();
+}
+
+// Auto-init if already authenticated (page refresh)
+if(sessionStorage.getItem('atomAuth')==='1'){
+  document.getElementById('pinGate').style.display = 'none';
+  init();
+}
+</script>
+</body>
+</html>
